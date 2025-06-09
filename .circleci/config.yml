@@ -1,0 +1,83 @@
+version: 2.1
+
+executors:
+  python-linux:
+    docker:
+      - image: cimg/python:<<parameters.python-version>>
+    parameters:
+      python-version:
+        type: string
+    working_directory: ~/repo
+
+  python-windows:
+    machine:
+      image: "windows-server-2019-vs2019:stable"
+    shell: powershell.exe
+    working_directory: ~/repo
+
+jobs:
+  unit-tests-linux:
+    parameters:
+      python-version:
+        type: string
+    executor:
+      name: python-linux
+      python-version: <<parameters.python-version>>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "requirements.txt" }}
+      - run:
+          name: Install dependencies
+          command: |
+            make install-test-requirements
+            make install-pre-commit
+      - save_cache:
+          key: v1-deps-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.cache/pip
+      - run:
+          name: pip freeze
+          command: uv pip freeze --system
+      - run:
+          name: Run unit tests
+          command: make test
+
+  unit-tests-windows:
+    parameters:
+      python-version:
+        type: string
+    executor:
+      name: python-windows
+      python-version: <<parameters.python-version>>
+    steps:
+      - checkout
+      - run:
+          name: Set up Python
+          command: |
+            choco install python --version=<<parameters.python-version>>
+            refreshenv
+      - run:
+          name: Install dependencies
+          command: |
+            make install-test-requirements
+            make install-pre-commit
+      - run:
+          name: pip freeze
+          command: uv pip freeze --system
+      - run:
+          name: Run unit tests
+          command: make test
+
+workflows:
+  unit-tests-matrix:
+    jobs:
+      - unit-tests-linux:
+          matrix:
+            parameters:
+              python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+      - unit-tests-windows:
+          matrix:
+            parameters:
+              python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ] 
