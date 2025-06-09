@@ -32,6 +32,7 @@ jobs:
           name: Install dependencies
           command: |
             make install-test-requirements
+            pip install pytest
             # make install-pre-commit
       - save_cache:
           key: v1-deps-{{ checksum "requirements.txt" }}
