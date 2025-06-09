@@ -28,7 +28,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-deps-{{ checksum "requirements.txt" }}
+            - v1-deps-{{ checksum "kedro/templates/project/{{ cookiecutter.repo_name }}/requirements.txt" }}
       - run:
           name: Install dependencies
           command: |
@@ -36,7 +36,7 @@ jobs:
             pip install pytest
             # make install-pre-commit
       - save_cache:
-          key: v1-deps-{{ checksum "requirements.txt" }}
+          key: v1-deps-{{ checksum "kedro/templates/project/{{ cookiecutter.repo_name }}/requirements.txt" }}
           paths:
             - ~/.cache/pip
       - run:
