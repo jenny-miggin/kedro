@@ -60,6 +60,9 @@ jobs:
             choco install python --version=<<parameters.python-version>>
             refreshenv
       - run:
+          name: Install make
+          command: choco install make
+      - run:
           name: Install dependencies
           command: |
             make install-test-requirements
