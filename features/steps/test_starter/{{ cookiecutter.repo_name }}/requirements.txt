@@ -3,3 +3,4 @@ jupyterlab>=3.0
 notebook
 kedro~={{ cookiecutter.kedro_version }}
 kedro-datasets[pandas-csvdataset]
+pre-commit
