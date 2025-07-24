@@ -43,7 +43,12 @@ package: clean install
 
 install-test-requirements:
 	python -m pip install "uv==0.4.29"
-	uv pip install --system "kedro[test] @ ."
+	@if uv pip install --system "kedro[test] @ ."; then \
+		echo "Successfully installed test requirements with uv"; \
+	else \
+		echo "uv system install failed, falling back to pip install"; \
+		python -m pip install --break-system-packages -e ".[test]" || python -m pip install -e ".[test]"; \
+	fi
 
 install-pre-commit:
 	pre-commit install --install-hooks

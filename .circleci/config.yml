@@ -32,16 +32,22 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            make install-test-requirements
-            pip install pytest
-            # make install-pre-commit
+            # Install uv
+            python -m pip install "uv==0.4.29"
+            # Try the normal installation first
+            if ! uv pip install --system "kedro[test] @ ."; then
+              echo "uv system install failed, falling back to pip install with --break-system-packages"
+              python -m pip install --break-system-packages -e ".[test]"
+            fi
+            # Ensure pytest is available
+            python -m pip install --break-system-packages pytest
       - save_cache:
           key: v1-deps-{{ checksum "kedro/templates/project/{{ cookiecutter.repo_name }}/requirements.txt" }}
           paths:
             - ~/.cache/pip
       - run:
           name: pip freeze
-          command: uv pip freeze --system
+          command: uv pip freeze --system || pip freeze
       - run:
           name: Run unit tests
           command: make test
@@ -65,11 +71,19 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            make install-test-requirements
-            make install-pre-commit
+            python -m pip install "uv==0.4.29"
+            # Try the normal installation first
+            if (!(uv pip install --system "kedro[test] @ .")) {
+              Write-Host "uv system install failed, falling back to pip install"
+              python -m pip install -e ".[test]"
+            }
+            # Ensure pytest is available
+            python -m pip install pytest
       - run:
           name: pip freeze
-          command: uv pip freeze --system
+          command: |
+            uv pip freeze --system
+            if ($LASTEXITCODE -ne 0) { pip freeze }
       - run:
           name: Run unit tests
           command: make test
