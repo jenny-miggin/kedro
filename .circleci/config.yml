@@ -43,8 +43,6 @@ jobs:
             fi
             # Ensure pytest is installed and available
             python -m pip install pytest pytest-xdist pytest-mock pytest-cov
-            # Verify pytest is available
-            pytest --version
       - save_cache:
           key: v1-deps-{{ checksum "kedro/templates/project/{{ cookiecutter.repo_name }}/requirements.txt" }}
           paths:
@@ -85,8 +83,6 @@ jobs:
             }
             # Ensure pytest is installed and available
             python -m pip install pytest pytest-xdist pytest-mock pytest-cov
-            # Verify pytest is available
-            pytest --version
       - run:
           name: pip freeze
           command: pip freeze
